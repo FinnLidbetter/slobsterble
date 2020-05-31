@@ -76,8 +76,11 @@ class GamePlayer(db.Model, ModelMixin, ModelSerializer):
 
 class Game(db.Model, ModelMixin, ModelSerializer):
     """A game."""
-    serialize_exclude_fields = ['dictionary_id']
-    serialize_include_fields = ['num_players', 'whose_turn']
+    serialize_exclude_fields = ['dictionary_id',
+                                'game_player_to_play_id',
+                                'game_player_to_play']
+    serialize_include_fields = [
+        'num_players', 'whose_turn_name', 'num_tiles_remaining']
 
     board_state = db.relationship(
         'PlayedTile',
@@ -104,18 +107,26 @@ class Game(db.Model, ModelMixin, ModelSerializer):
                             nullable=False,
                             default=0,
                             doc='The current turn number of the game.')
+    game_player_to_play_id = db.Column(db.Integer,
+                                       db.ForeignKey('game_player.id'),
+                                       nullable=False)
+    game_player_to_play = relationship(
+        'GamePlayer', doc='The game player whose turn it is to play.')
 
     @property
     def num_players(self):
         return len(self.game_players)
 
     @property
-    def whose_turn(self):
-        turn_order_number = self.turn_number % len(self.game_players)
-        for game_player in self.game_players:
-            if game_player.turn_order == turn_order_number:
-                return game_player.player.display_name
-        return 'Unknown'
+    def whose_turn_name(self):
+        return game_player_to_play.player.display_name
+
+    @property
+    def num_tiles_remaining(self):
+        tile_total = 0
+        for tile_count in self.bag_tiles:
+            tile_total += tile_count.count
+        return tile_total
 
 
 class Move(db.Model, ModelMixin, ModelSerializer):

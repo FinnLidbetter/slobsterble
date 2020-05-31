@@ -10,6 +10,7 @@ class Tile(db.Model, ModelMixin, ModelSerializer):
     """A letter and its value, possibly blank."""
     letter = db.Column(db.String(1),
                        nullable=True,
+                       collate='NOCASE',
                        doc='The letter to display on this tile (possibly '
                            'None).')
     is_blank = db.Column(db.Boolean,

@@ -33,7 +33,8 @@ class Dictionary(db.Model, ModelMixin, ModelSerializer):
 
 class Entry(db.Model, ModelMixin, ModelSerializer):
     """A word and its definition(s)."""
-    word = db.Column(db.String(30), index=True, unique=True, nullable=False)
+    word = db.Column(db.String(30) , index=True,
+                     unique=True, nullable=False)
     definition = db.Column(
         db.Text,
         doc='Optional definition for the word. In case of '
